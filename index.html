@@ -13,7 +13,7 @@
     <canvas
       id="canvas"
       width="1200"
-      height="650"
+      height="600"
       style="border: 1px solid black"
     ></canvas>
     <script>
@@ -26,14 +26,16 @@
           image.src = e.target.result;
           image.onload = function () {
             var img = new fabric.Image(image);
-            img.set({
-              // left: 50,
-              // top: 60,
-            });
+            // img.set({
+            //   left: 50,
+            //   top: 60,
+            // });
             // img.scaleToWidth(200);
-            img.scaleToWidth(canvas.getWidth());
+            // img.scaleToWidth(canvas.getWidth());
             // img.scaleToHeight(canvas.getHeight());
             canvas.add(img).setActiveObject(img).renderAll();
+            canvas.centerObject(img);
+            img.setCoords(img);
           };
         };
         reader.readAsDataURL(e.target.files[0]);
