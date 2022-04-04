@@ -27,13 +27,11 @@
           image.onload = function () {
             var img = new fabric.Image(image);
             img.set({
-              // originX: 0,
-              // originY: 0,
               left: 50,
               top: 60,
             });
             // img.scaleToWidth(200);
-            // img.scaleToWidth(canvas.getWidth());
+            img.scaleToWidth(canvas.getWidth());
             // img.scaleToHeight(canvas.getHeight());
             canvas.add(img).setActiveObject(img).renderAll();
           };
