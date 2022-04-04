@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <input id="uploader" type="file" />
+    <button id="clear" onclick="{{canvas.clear()}}">Reset</button>
+    <canvas
+      id="canvas"
+      width="800"
+      height="650"
+      style="border: 1px solid black"
+    ></canvas>
+    <script>
+      var canvas = new fabric.Canvas("canvas");
+      var image = document.getElementById("uploader");
+      image.onchange = function (e) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var image = new Image();
+          image.src = e.target.result;
+          image.onload = function () {
+            var img = new fabric.Image(image);
+            img.set({
+              // originX: 0,
+              // originY: 0,
+              left: 50,
+              top: 60,
+            });
+            // img.scaleToWidth(200);
+            // img.scaleToWidth(canvas.getWidth());
+            // img.scaleToHeight(canvas.getHeight());
+            canvas.add(img).setActiveObject(img).renderAll();
+          };
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      };
+      var fabricImage = new fabric.Image(image);
+      canvas.add(fabricImage);
+    </script>
+    <script>
+      canvas.on("mouse:wheel", function (opt) {
+        var delta = opt.e.deltaY;
+        var zoom = canvas.getZoom();
+        zoom *= 0.999 ** delta;
+        if (zoom > 20) zoom = 20;
+        if (zoom < 1) zoom = 1;
+        canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+        opt.e.preventDefault();
+        opt.e.stopPropagation();
+      });
+    </script>
+  </body>
+</html>
