@@ -37,41 +37,76 @@
             canvas.add(img).setActiveObject(img).renderAll();
             canvas.centerObject(img);
             img.setCoords(img);
-            canvas.on("mouse:wheel", function (opt) {
-              // var img = new fabric.Image(image);
+            canvas.on("mouse:wheel", (opt) => {
               var delta = opt.e.deltaY;
               var zoom = canvas.getZoom();
               zoom *= 0.999 ** delta;
               if (zoom > 20) zoom = 20;
-              // if (zoom < 1) zoom = 1;
-              if (zoom < 1) {
-                // reset.Image(img);
-                canvas.centerObject(img);
-                zoom = 1;
-              }
-              canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+              if (zoom < 1) zoom = 1;
+              canvas.zoomToPoint(
+                new fabric.Point(opt.e.offsetX, opt.e.offsetY),
+                zoom
+              );
               opt.e.preventDefault();
               opt.e.stopPropagation();
-              var vpt = this.viewportTransform;
-              if (zoom < 400 / 1000) {
+              var vpt = canvas.viewportTransform;
+              if (zoom < 0.4) {
                 vpt[4] = 200 - (1000 * zoom) / 2;
-                vpt[5] = 200 - (1000 * zoom) / 2;
+                vpt[5] = 200 - (400 * zoom) / 2;
               } else {
                 if (vpt[4] >= 0) {
                   vpt[4] = 0;
-                  // canvas.centerObject(img);
                 } else if (vpt[4] < canvas.getWidth() - 1000 * zoom) {
                   vpt[4] = canvas.getWidth() - 1000 * zoom;
-                  // canvas.centerObject(img);
                 }
                 if (vpt[5] >= 0) {
                   vpt[5] = 0;
-                  // canvas.centerObject(img);
-                } else if (vpt[5] < canvas.getHeight() - 1000 * zoom) {
-                  vpt[5] = canvas.getHeight() - 1000 * zoom;
-                  // canvas.centerObject(img);
+                } else if (vpt[5] < canvas.getHeight() - 400 * zoom) {
+                  vpt[5] = canvas.getHeight() - 400 * zoom;
                 }
               }
+              canvas.requestRenderAll();
+            });
+            canvas.on("mouse:down", function (opt) {
+              var evt = opt.e;
+              if (evt.altKey === true) {
+                this.isDragging = true;
+                this.selection = false;
+                this.lastPosX = evt.clientX;
+                this.lastPosY = evt.clientY;
+              }
+            });
+            canvas.on("mouse:move", function (opt) {
+              if (this.isDragging) {
+                var e = opt.e;
+                var zoom = canvas.getZoom();
+                var vpt = this.viewportTransform;
+                if (zoom < 0.4) {
+                  vpt[4] = 200 - (1000 * zoom) / 2;
+                  vpt[5] = 200 - (400 * zoom) / 2;
+                } else {
+                  vpt[4] += e.clientX - this.lastPosX;
+                  vpt[5] += e.clientY - this.lastPosY;
+                  if (vpt[4] >= 0) {
+                    vpt[4] = 0;
+                  } else if (vpt[4] < canvas.getWidth() - 1000 * zoom) {
+                    vpt[4] = canvas.getWidth() - 1000 * zoom;
+                  }
+                  if (vpt[5] >= 0) {
+                    vpt[5] = 0;
+                  } else if (vpt[5] < canvas.getHeight() - 400 * zoom) {
+                    vpt[5] = canvas.getHeight() - 400 * zoom;
+                  }
+                }
+                this.requestRenderAll();
+                this.lastPosX = e.clientX;
+                this.lastPosY = e.clientY;
+              }
+            });
+            canvas.on("mouse:up", function (opt) {
+              this.setViewportTransform(this.viewportTransform);
+              this.isDragging = false;
+              this.selection = true;
             });
           };
         };
